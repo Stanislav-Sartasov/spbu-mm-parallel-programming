@@ -4,3 +4,4 @@
 
 [Thread Pool](/src/main/kotlin/com/github/avlomakin/threadpool)
  
+See [test](/src/test/kotlin/com/github/avlomakin) folder for more info
