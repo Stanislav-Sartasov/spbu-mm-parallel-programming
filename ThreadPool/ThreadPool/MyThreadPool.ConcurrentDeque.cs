@@ -8,9 +8,7 @@ namespace ThreadPool
         private class DequeWithLock<T>
         {
             private readonly object _lock = new();
-            private readonly LinkedList<T> _deque;
-
-            public DequeWithLock() => _deque = new LinkedList<T>();
+            private readonly LinkedList<T> _deque = new();
 
             public void Push(T value)
             {

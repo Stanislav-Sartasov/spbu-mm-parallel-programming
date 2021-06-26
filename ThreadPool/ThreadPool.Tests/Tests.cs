@@ -60,6 +60,10 @@ namespace ThreadPool.Tests
             var cont = root.ContinueWith(result => result);
             tp.Enqueue(cont);
 
+            Assert.Throws<AggregateException>(() =>
+            {
+                var _ = cont.Result;
+            });
             try
             {
                 var _ = cont.Result;
@@ -115,6 +119,19 @@ namespace ThreadPool.Tests
             });
 
             Assert.AreEqual(50, task.Result);
+        }
+
+        [Test]
+        public void LoadTest()
+        {
+            using var tp = new MyThreadPool(8);
+            var range = Enumerable.Range(0, 10000);
+            var numbers = range.ToArray();
+            var tasks = range.Select(i => tp.Enqueue(() => i)).ToArray();
+
+            while (tasks.Any(t => !t.IsCompleted)) {}
+
+            CollectionAssert.AreEqual(numbers, tasks.Select(t => t.Result));
         }
     }
 }
