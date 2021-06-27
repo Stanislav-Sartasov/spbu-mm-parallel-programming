@@ -1,35 +1,33 @@
 package Solution;
 
 public class Consumer extends Thread{
-    private int sleepTime = 0;
-    private Market market;
-    Consumer(int sleepTime, Market market){
-        this.sleepTime = sleepTime;
-        this.market = market;
-    }
     private int count = 0;
-
+    Monitor monitor;
+    ProducerConsumer producerConsumer;
+    Consumer(Monitor monitor, ProducerConsumer producerConsumer){
+        this.monitor = monitor;
+        this.producerConsumer = producerConsumer;
+    }
     @Override
     public void run() {
-        while (!market.getThreadFlag()){
-            if(count == 1){
+        while (!producerConsumer.getThreadFlag()){
+            if(count < 3) {
+                waitOrSet(monitor.criticalSection("get"));
+            }else {
                 try {
-                    Thread.sleep(sleepTime);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }finally {
-                    count = 0;
+                    Thread.sleep(1000);
+                }catch (InterruptedException e) {
                 }
+                count = 0;
             }
-            try {
-                //getting and deleting an item from a list
-                market.getElement(0);
-            }catch (IndexOutOfBoundsException e){
-                count--;
-            }
-            count++;
         }
-        System.out.print("Solution.Consumer закончил работу: ");
-        System.out.println(currentThread().getId());
+        System.out.println("Solution.Consumer закончил работу: " + currentThread().getId());
+    }
+
+    private void waitOrSet(int check){
+        switch (check){
+            case 0:count++;
+            case 1: try {Thread.sleep(1000);}catch (InterruptedException e){}
+        }
     }
 }

@@ -1,5 +1,5 @@
 package Test;
-import Solution.Market;
+import Solution.ProducerConsumer;
 import junit.framework.TestCase;
 
 import java.awt.*;
@@ -7,21 +7,21 @@ import java.awt.event.KeyEvent;
 
 public class MarketTest extends TestCase {
     public void test1(){
-        assertEquals(4,checkThreadLive(new Market(2,2)));
+        assertEquals(4,checkThreadLive(new ProducerConsumer(2,2)));
     }
     public void test2(){
-        assertEquals(8,checkThreadLive(new Market(4,4)));
+        assertEquals(8,checkThreadLive(new ProducerConsumer(4,4)));
     }
     public void test3(){
-        assertEquals(12,checkThreadLive(new Market(4,8)));
+        assertEquals(12,checkThreadLive(new ProducerConsumer(4,8)));
     }
     public void test4(){
-        assertEquals(6,checkThreadLive(new Market(0,6)));
+        assertEquals(6,checkThreadLive(new ProducerConsumer(0,6)));
     }
 
     //return count stopped threads
-    private int checkThreadLive(Market m){
-        m.openMarket();
+    private int checkThreadLive(ProducerConsumer m){
+        m.startProgram();
         Thread robot = new Thread(new Rob());
         robot.start();
         while (true){
