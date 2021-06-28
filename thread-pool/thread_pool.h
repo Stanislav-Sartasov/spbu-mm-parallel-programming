@@ -6,6 +6,8 @@
 #include <pthread.h>
 #include "list.h"
 
+#define barrier() __asm__ __volatile__("": : :"memory")
+
 struct work_arg {
 	double *pi;
 	int num;

@@ -120,6 +120,7 @@ void thread_pool_destroy(struct thread_pool *tpool) {
 		free(curr_work);
 	}
 	tpool->finish = 1;
+	barrier();
 	pthread_cond_broadcast(&tpool->thread_add_work_cond);
 	pthread_mutex_unlock(&tpool->thread_pool_mutex);
 
