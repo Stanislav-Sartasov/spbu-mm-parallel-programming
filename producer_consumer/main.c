@@ -27,15 +27,15 @@ void interrupt()
       	interrupt_flag = 1;
 }
 
-static void* producer();
+static void *producer();
 
-static void* consumer();
+static void *consumer();
 
 int main(int argc, char **argv)
 {
-	int i, err = 0;
 	int prod_num, cons_num;
 	pthread_t *thread_id;
+	int i, k, err;
 	
 	signal(SIGINT, interrupt);
 	srand(time(NULL));
@@ -54,27 +54,31 @@ int main(int argc, char **argv)
 
 	thread_id = (pthread_t *) calloc((prod_num + cons_num), sizeof(pthread_t));
 	i = 0;
-	while (i < prod_num) {
-		err = pthread_create((thread_id + i), NULL, &producer, NULL);
+	k = 0;
+	while (i + k != prod_num + cons_num) {
+		if (i < prod_num) {
+			err = pthread_create((thread_id + i + k), NULL, producer, NULL);
 		
-		if (err != 0) {
-			free(thread_id);
-			pthread_mutex_destroy(&node_mutex);
-			error(EXIT_FAILURE, err, "Failed to create a thread");
+			if (err != 0) {
+				free(thread_id);
+				pthread_mutex_destroy(&node_mutex);
+				error(EXIT_FAILURE, err, "Failed to create a thread");
+			}
+
+			++i;
 		}
 
-		i++;
-	}
-	while (i < prod_num + cons_num) {
-		err = pthread_create((thread_id + i), NULL, &consumer, NULL);
-
-		if (err != 0) {
-			free(thread_id);
-			pthread_mutex_destroy(&node_mutex);
-			error(EXIT_FAILURE, err, "Failed to create a thread");
+		if (k < cons_num) {
+			err = pthread_create((thread_id + i + k), NULL, consumer, NULL);
+		
+			if (err != 0) {
+				free(thread_id);
+				pthread_mutex_destroy(&node_mutex);
+				error(EXIT_FAILURE, err, "Failed to create a thread");
+			}
+			
+			++k;
 		}
-
-		i++;
 	}
 
 	i = 0;
@@ -136,7 +140,7 @@ static void *consumer()
 		pthread_mutex_lock(&node_mutex);
 		if (list_empty(&node_list_head)) {
 			pthread_mutex_unlock(&node_mutex);
-			sleep(1);
+			usleep(500000);
 			continue;
 		}
 
