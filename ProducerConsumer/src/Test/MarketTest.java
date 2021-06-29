@@ -6,6 +6,9 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 
 public class MarketTest extends TestCase {
+    public void test0(){
+        assertEquals(2,checkThreadLive(new ProducerConsumer(1,1)));
+    }
     public void test1(){
         assertEquals(4,checkThreadLive(new ProducerConsumer(2,2)));
     }

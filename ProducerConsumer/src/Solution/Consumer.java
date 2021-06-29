@@ -12,7 +12,8 @@ public class Consumer extends Thread{
     public void run() {
         while (!producerConsumer.getThreadFlag()){
             if(count < 3) {
-                waitOrSet(monitor.criticalSection("get"));
+                count++;
+                monitor.get();
             }else {
                 try {
                     Thread.sleep(1000);
@@ -22,12 +23,5 @@ public class Consumer extends Thread{
             }
         }
         System.out.println("Solution.Consumer закончил работу: " + currentThread().getId());
-    }
-
-    private void waitOrSet(int check){
-        switch (check){
-            case 0:count++;
-            case 1: try {Thread.sleep(1000);}catch (InterruptedException e){}
-        }
     }
 }
