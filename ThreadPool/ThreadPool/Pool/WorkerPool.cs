@@ -82,18 +82,16 @@ namespace ThreadPool.Pool
             Console.WriteLine("Shutting down...");
 
             _CancelTokenSource.Cancel();
-            _CancelTokenSource.Dispose();
 
             _Pool.ForEach(worker => { worker.Awake(); });
 
-            while (_Pool.Any(Worker => Worker.IsWorking))
-            {
-                Thread.Sleep(100);
-            }
+            while (_Pool.Any(Worker => Worker.IsWorking)) {}
 
             _Pool.ForEach(worker => { worker.Dispose(); });
 
-            TaskFactory.Dispose();
+            TaskFactory.Instance.Dispose();
+
+            _CancelTokenSource.Dispose();
             _instance = null;
             
         }

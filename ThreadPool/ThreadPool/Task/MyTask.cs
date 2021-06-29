@@ -9,6 +9,7 @@ namespace ThreadPool.Task
     public abstract class MyTask 
     {
         protected TaskScheduler _taskScheduler;
+        protected ManualResetEvent _taskCompleted;
 
         public bool IsCompleted { get; protected set; }
         public bool IsReady { get; set; }
@@ -32,8 +33,8 @@ namespace ThreadPool.Task
         {
             if (!_wasStarted)
             {
+                _taskCompleted = _taskScheduler.Enqueue(this);
                 _wasStarted = true;
-                _taskScheduler.Enqueue(this);
             }
         }
 
@@ -44,9 +45,16 @@ namespace ThreadPool.Task
                 return;
             }
 
-            while (!IsCompleted)
+            if (!IsCompleted)
             {
-                Thread.Sleep(100);
+                try 
+                { 
+                    _taskCompleted.WaitOne(); 
+                }
+                catch (ObjectDisposedException exc)
+                {
+                    Console.WriteLine(exc.Message + ", worker pool has been shut down");
+                }
             }
         }
 
@@ -107,7 +115,20 @@ namespace ThreadPool.Task
         {
             Result = Task();
 
-            _nextTasks.ForEach(task => task.IsReady = true);
+            _nextTasks.ForEach(task => 
+            { 
+                task.IsReady = true;
+                try
+                {
+                    _taskScheduler.NewTask(); 
+                }
+                catch (Exception exc)
+                {
+                    Console.WriteLine(exc.Message);
+                } 
+            });
+
+            _taskCompleted.Set();
         }
     }
 
@@ -129,7 +150,20 @@ namespace ThreadPool.Task
         {
             Result = Task(_prevTask.Result);
 
-            _nextTasks.ForEach(task => task.IsReady = true);
+            _nextTasks.ForEach(task =>
+            {
+                task.IsReady = true;
+                try
+                {
+                    _taskScheduler.NewTask();
+                }
+                catch (Exception exc)
+                {
+                    Console.WriteLine(exc.Message);
+                }
+            });
+
+            _taskCompleted.Set();
         }
     }
 }

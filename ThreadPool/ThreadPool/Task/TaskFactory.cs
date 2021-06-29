@@ -5,7 +5,7 @@ using ThreadPool.Pool;
 
 namespace ThreadPool.Task
 {
-    public class TaskFactory
+    public class TaskFactory : IDisposable
     {
         private static readonly object _syncRoot = new object();
         private static TaskFactory _instance;
@@ -57,8 +57,9 @@ namespace ThreadPool.Task
             return task;
         }
 
-        public static void Dispose()
+        public void Dispose()
         {
+            _taskScheduler.Dispose();
             _instance = null;
         }
     }
