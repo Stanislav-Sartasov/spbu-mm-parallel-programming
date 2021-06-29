@@ -175,8 +175,13 @@ void tpool_delete(tpool_t *tpool)
 		return;
 
 	pthread_mutex_lock(&(tpool->tpool_mutex));
+	
 	tpool->stop = 1;
+	
+	__sync_synchronize();
+	
 	pthread_cond_broadcast(&(tpool->wake_cond));
+	
 	pthread_mutex_unlock(&(tpool->tpool_mutex));
 
 	tpool_wait(tpool);
