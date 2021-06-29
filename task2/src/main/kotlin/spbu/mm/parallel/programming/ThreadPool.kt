@@ -9,6 +9,7 @@ class ThreadPool(numThreads: Int) {
     private val workerRegistry: WorkerRegistry = WorkerRegistry()
     private val lock = object {}
 
+    @Volatile
     var disposed: Boolean = false
         private set
 
