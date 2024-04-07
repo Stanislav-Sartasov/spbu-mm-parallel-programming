@@ -27,7 +27,12 @@ public class Queue {
     }
 
     public boolean isEmpty() {
-        return buffer.isEmpty();
+        try {
+            lock.lock();
+            return buffer.isEmpty();
+        } finally {
+            lock.unlock();
+        }
     }
 
     @Override
