@@ -153,4 +153,52 @@ TYPED_TEST(ThreadPoolTest, TaskDependencies)
 
     ASSERT_EQ(dependent_task.get(), "Result is 42");
 }
+
+
+// Test continuation with simple types
+TYPED_TEST(ThreadPoolTest, ContinueWithSimpleType)
+{
+    auto initial_task = this->pool.enqueue([]() { return 42; });
+
+    auto continuation_task = this->pool.continue_with(
+        std::move(initial_task), [](int result) -> std::string {
+            return std::to_string(result) + " is the answer";
+        });
+
+    ASSERT_EQ(continuation_task.get(), "42 is the answer");
+}
+
+// Test chaining multiple continuations
+TYPED_TEST(ThreadPoolTest, ChainMultipleContinuations)
+{
+    auto initial_task = this->pool.enqueue([]() { return 1; });
+
+    auto first_continuation_task =
+        this->pool.continue_with(std::move(initial_task), [](int result) {
+            return result + 1; // Increment the result
+        });
+
+    auto second_continuation_task = this->pool.continue_with(
+        std::move(first_continuation_task), [](int result) {
+            return result * 2; // Double the result
+        });
+
+    ASSERT_EQ(second_continuation_task.get(), 4); // Expected result is 4
+}
+
+// Test continuation with complex types
+TYPED_TEST(ThreadPoolTest, ContinueWithComplexType)
+{
+    std::future<std::vector<int>> initial_task =
+        this->pool.enqueue([]() -> std::vector<int> {
+            return {1, 2, 3, 4, 5};
+        });
+
+    auto continuation_task = this->pool.continue_with(
+        std::move(initial_task), [](const std::vector<int> &vec) {
+            // Sum the vector elements
+            return std::accumulate(vec.begin(), vec.end(), 0);
+        });
+
+    ASSERT_EQ(continuation_task.get(), 15); // Sum of 1+2+3+4+5
 }
