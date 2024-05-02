@@ -1,5 +1,7 @@
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import ru.turbogoose.pool.FixedThreadPool;
 import ru.turbogoose.pool.ThreadPool;
 import ru.turbogoose.task.Task;
@@ -12,22 +14,24 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ThreadPoolTest {
-    @Test
+    @ParameterizedTest
+    @EnumSource(BalancingStrategy.class)
     @DisplayName("Check number of created threads")
-    public void shouldCreatePassedNumberOfThreads() throws Exception {
+    public void shouldCreatePassedNumberOfThreads(BalancingStrategy balancingStrategy) throws Exception {
         int threadCountWithoutPool = Thread.activeCount();
         int poolThreadCount = 10;
-        ThreadPool threadPool = new FixedThreadPool(poolThreadCount, BalancingStrategy.WORK_SHARING);
+        ThreadPool threadPool = new FixedThreadPool(poolThreadCount, balancingStrategy);
         assertEquals(threadCountWithoutPool + poolThreadCount, Thread.activeCount());
         threadPool.close();
         trySleep(1000);
         assertEquals(threadCountWithoutPool, Thread.activeCount());
     }
 
-    @Test
+    @ParameterizedTest
+    @EnumSource(BalancingStrategy.class)
     @DisplayName("Check result() is blocking and return right answer")
-    public void shouldBlockAndReturnResultWhenResultCalled() throws Exception {
-        try (ThreadPool threadPool = new FixedThreadPool(3, BalancingStrategy.WORK_SHARING)) {
+    public void shouldBlockAndReturnResultWhenResultCalled(BalancingStrategy balancingStrategy) throws Exception {
+        try (ThreadPool threadPool = new FixedThreadPool(3, balancingStrategy)) {
             TaskScheduler scheduler = new TaskScheduler(threadPool);
             Task<String> task = scheduler.schedule(() -> {
                 trySleep(1000);
@@ -37,10 +41,11 @@ public class ThreadPoolTest {
         }
     }
 
-    @Test
+    @ParameterizedTest
+    @EnumSource(BalancingStrategy.class)
     @DisplayName("Check isCompleted() not blocking and return status according to execution progress")
-    public void shouldNotBlockAndReturnStatusWhenIsCompletedCalled() throws Exception {
-        try (ThreadPool threadPool = new FixedThreadPool(3, BalancingStrategy.WORK_SHARING)) {
+    public void shouldNotBlockAndReturnStatusWhenIsCompletedCalled(BalancingStrategy balancingStrategy) throws Exception {
+        try (ThreadPool threadPool = new FixedThreadPool(3, balancingStrategy)) {
             TaskScheduler scheduler = new TaskScheduler(threadPool);
             Task<String> task = scheduler.schedule(() -> {
                 trySleep(1000);
@@ -52,12 +57,13 @@ public class ThreadPoolTest {
         }
     }
 
-    @Test
+    @ParameterizedTest
+    @EnumSource(BalancingStrategy.class)
     @DisplayName("Check case when #_tasks > #_threads")
-    public void shouldProcessWhenThereAreMoreTasksThanThreads() throws Exception {
+    public void shouldProcessWhenThereAreMoreTasksThanThreads(BalancingStrategy balancingStrategy) throws Exception {
         int taskCount = 15;
         List<Task<?>> tasks = new ArrayList<>(taskCount);
-        try (ThreadPool threadPool = new FixedThreadPool(3, BalancingStrategy.WORK_SHARING)) {
+        try (ThreadPool threadPool = new FixedThreadPool(3, balancingStrategy)) {
             TaskScheduler scheduler = new TaskScheduler(threadPool);
 
             for (int i = 0; i < taskCount; i++) {
@@ -73,10 +79,11 @@ public class ThreadPoolTest {
         }
     }
 
-    @Test
+    @ParameterizedTest
+    @EnumSource(BalancingStrategy.class)
     @DisplayName("Check tasks process sequentially using continueWith()")
-    public void shouldProcessContinuedTasksSequentially() throws Exception {
-        try (ThreadPool threadPool = new FixedThreadPool(3, BalancingStrategy.WORK_SHARING)) {
+    public void shouldProcessContinuedTasksSequentially(BalancingStrategy balancingStrategy) throws Exception {
+        try (ThreadPool threadPool = new FixedThreadPool(3, balancingStrategy)) {
             TaskScheduler scheduler = new TaskScheduler(threadPool);
 
             Task<String> task1 = scheduler.schedule(() -> {
@@ -96,10 +103,11 @@ public class ThreadPoolTest {
         }
     }
 
-    @Test
+    @ParameterizedTest
+    @EnumSource(BalancingStrategy.class)
     @DisplayName("Check thread pool does not accept tasks after closing and finish existent tasks")
-    public void shouldNotAcceptNewTasksAndFinishExistentWhenClosing() throws Exception {
-        ThreadPool threadPool = new FixedThreadPool(3, BalancingStrategy.WORK_SHARING);
+    public void shouldNotAcceptNewTasksAndFinishExistentWhenClosing(BalancingStrategy balancingStrategy) throws Exception {
+        ThreadPool threadPool = new FixedThreadPool(3, balancingStrategy);
         TaskScheduler scheduler = new TaskScheduler(threadPool);
 
         Task<String> task = scheduler.schedule(() -> {
@@ -112,10 +120,11 @@ public class ThreadPoolTest {
         assertThrows(IllegalStateException.class, () -> scheduler.schedule(() -> "Blin, ne uspel :("));
     }
 
-    @Test
+    @ParameterizedTest
+    @EnumSource(BalancingStrategy.class)
     @DisplayName("Check exception thrown in task is wrapped and rethrown on result() call ")
-    public void shouldRethrowExceptionWhenItIsThrownFromTask() throws Exception {
-        try (ThreadPool threadPool = new FixedThreadPool(3, BalancingStrategy.WORK_SHARING)) {
+    public void shouldRethrowExceptionWhenItIsThrownFromTask(BalancingStrategy balancingStrategy) throws Exception {
+        try (ThreadPool threadPool = new FixedThreadPool(3, balancingStrategy)) {
             TaskScheduler scheduler = new TaskScheduler(threadPool);
 
             Task<String> task = scheduler.schedule(() -> {
