@@ -19,10 +19,6 @@ public class TaskScheduler {
     }
 
     public <T, C> Task<C> continueWith(Task<T> task, Function<T, C> continuation) {
-        return schedule(() -> {
-            while (!task.isCompleted()) {
-            }
-            return continuation.apply(task.result());
-        });
+        return schedule(() -> continuation.apply(task.result()));
     }
 }

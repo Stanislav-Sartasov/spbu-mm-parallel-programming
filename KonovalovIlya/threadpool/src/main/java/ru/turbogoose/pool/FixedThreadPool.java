@@ -26,6 +26,8 @@ public class FixedThreadPool implements ThreadPool {
             context.putIfAbsent(newThread.getId(), new BlockingDeque<>());
             threads.add(newThread);
         }
+        threads.forEach(Thread::start);
+        System.out.println("Thread pool initialized and running");
     }
 
     @Override
@@ -38,5 +40,6 @@ public class FixedThreadPool implements ThreadPool {
     @Override
     public void close() {
         threads.forEach(Thread::interrupt);
+        System.out.println("Thread pool closed");
     }
 }

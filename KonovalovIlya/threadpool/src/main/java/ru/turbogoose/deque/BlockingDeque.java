@@ -15,7 +15,7 @@ public class BlockingDeque<T> implements Deque<T> {
 
     @Override
     public synchronized T popTail() {
-        return deque.removeLast();
+        return deque.pollLast();
     }
 
     @Override
@@ -25,7 +25,7 @@ public class BlockingDeque<T> implements Deque<T> {
 
     @Override
     public synchronized T popHead() {
-        return deque.removeFirst();
+        return deque.pollFirst();
     }
 
     @Override

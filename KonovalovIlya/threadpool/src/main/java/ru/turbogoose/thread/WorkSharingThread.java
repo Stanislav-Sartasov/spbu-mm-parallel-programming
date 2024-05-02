@@ -18,9 +18,9 @@ public class WorkSharingThread extends Thread {
 
     @Override
     public void run() {
-        long myId = Thread.currentThread().getId();
-        Deque<Task<?>> myQueue = context.get(myId);
-        while (true) {
+        Thread me = Thread.currentThread();
+        Deque<Task<?>> myQueue = context.get(me.getId());
+        while (!me.isInterrupted()) {
             Task<?> task = myQueue.popTail();
             if (task != null) {
                 task.run();
@@ -30,12 +30,7 @@ public class WorkSharingThread extends Thread {
                         .skip(random.nextInt(context.size()))
                         .findFirst().orElseThrow();
                 Deque<Task<?>> victimQueue = context.get(victimId);
-
-                synchronized (myQueue) {
-                    synchronized (victimQueue) {
-                        balance(myQueue, victimQueue);
-                    }
-                }
+                balance(myQueue, victimQueue);
             }
         }
     }

@@ -8,7 +8,7 @@ import ru.turbogoose.task.TaskScheduler;
 
 public class Application {
     public static void main(String[] args) {
-        try (ThreadPool pool = new FixedThreadPool(10, BalancingStrategy.WORK_STEALING)) {
+        try (ThreadPool pool = new FixedThreadPool(10, BalancingStrategy.WORK_SHARING)) {
             TaskScheduler scheduler = new TaskScheduler(pool);
 
             Task<String> task1 = scheduler.schedule(() -> {
@@ -25,16 +25,15 @@ public class Application {
 
             sleep(1000);
             System.out.println("Task1 completed: " + task1.isCompleted());
-            System.out.println("Result: " + task1.result());
+            System.out.println("Task1 Result: " + task1.result());
 
             sleep(1000);
             System.out.println("Task2 completed: " + task2.isCompleted());
-            System.out.println("Result: " + task2.result());
+            System.out.println("Task2 Result: " + task2.result());
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
 
 
     private static void sleep(long ms) {

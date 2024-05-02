@@ -1,11 +1,10 @@
 package ru.turbogoose.task;
 
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class TaskImpl<T> implements Task<T> {
     private final Supplier<T> task;
-    private T result = null;
+    private volatile T result = null;
 
     public TaskImpl(Supplier<T> task) {
         this.task = task;
@@ -18,13 +17,14 @@ public class TaskImpl<T> implements Task<T> {
 
     @Override
     public boolean isCompleted() {
-        // non-block
         return result != null;
     }
 
     @Override
     public T result() {
-        // block
+        while (result == null) {
+            Thread.yield();
+        }
         return result;
     }
 }
