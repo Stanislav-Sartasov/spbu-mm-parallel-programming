@@ -1,5 +1,7 @@
 package ru.turbogoose;
 
+import ru.turbogoose.deque.BlockingDeque;
+import ru.turbogoose.deque.Deque;
 import ru.turbogoose.thread.BalancingStrategy;
 import ru.turbogoose.thread.ThreadFactory;
 
@@ -9,7 +11,7 @@ public class FixedThreadPool implements AutoCloseable {
     private final Random random = new Random();
     private final int threadCount;
     private final List<Thread> threads;
-    private final Map<Long, BlockingDeque<Task<?>>> context; // thread id -> thread's task queue
+    private final Map<Long, Deque<Task<?>>> context; // thread id -> thread's task queue
     private boolean closed;
 
     public FixedThreadPool(int threadCount, BalancingStrategy balancingStrategy) {
