@@ -1,7 +1,6 @@
 package ru.turbogoose.thread;
 
 import ru.turbogoose.deque.Deque;
-import ru.turbogoose.pool.BalancingStrategy;
 import ru.turbogoose.task.Task;
 
 import java.util.Map;

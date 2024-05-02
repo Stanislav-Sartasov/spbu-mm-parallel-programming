@@ -3,6 +3,7 @@ package ru.turbogoose.pool;
 import ru.turbogoose.deque.BlockingDeque;
 import ru.turbogoose.deque.Deque;
 import ru.turbogoose.task.Task;
+import ru.turbogoose.thread.BalancingStrategy;
 import ru.turbogoose.thread.ThreadFactory;
 
 import java.util.*;
@@ -12,12 +13,14 @@ public class FixedThreadPool implements ThreadPool {
     private final int threadCount;
     private final List<Thread> threads;
     private final Map<Long, Deque<Task<?>>> context; // thread id -> thread's task queue
+    private boolean closed;
 
     public FixedThreadPool(int threadCount, BalancingStrategy balancingStrategy) {
         if (threadCount < 1) {
             throw new IllegalArgumentException("Thread count must be positive");
         }
         this.threadCount = threadCount;
+        this.closed = false;
 
         context = new HashMap<>(threadCount);
         threads = new ArrayList<>(threadCount);
@@ -32,6 +35,9 @@ public class FixedThreadPool implements ThreadPool {
 
     @Override
     public void enqueue(Task<?> task) {
+        if (closed) {
+            throw new IllegalStateException("Thread pool is closed");
+        }
         int threadNum = random.nextInt(threadCount);
         long threadId = threads.get(threadNum).getId();
         context.get(threadId).pushHead(task);
@@ -39,6 +45,7 @@ public class FixedThreadPool implements ThreadPool {
 
     @Override
     public void close() {
+        closed = true;
         threads.forEach(Thread::interrupt);
         System.out.println("Thread pool closed");
     }
