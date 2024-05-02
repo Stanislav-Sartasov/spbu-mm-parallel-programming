@@ -15,7 +15,7 @@ public class ThreadPoolTest {
     @ParameterizedTest
     @EnumSource(BalancingStrategy.class) // test runs for every enum value (it passes as method parameter)
     @DisplayName("Check number of created threads")
-    public void shouldCreatePassedNumberOfThreads(BalancingStrategy balancingStrategy) throws Exception {
+    public void shouldCreatePassedNumberOfThreads(BalancingStrategy balancingStrategy) {
         int threadCountWithoutPool = Thread.activeCount();
         int poolThreadCount = 10;
         FixedThreadPool threadPool = new FixedThreadPool(poolThreadCount, balancingStrategy);
@@ -28,7 +28,7 @@ public class ThreadPoolTest {
     @ParameterizedTest
     @EnumSource(BalancingStrategy.class)
     @DisplayName("Check result() is blocking and return right answer")
-    public void shouldBlockAndReturnResultWhenResultCalled(BalancingStrategy balancingStrategy) throws Exception {
+    public void shouldBlockAndReturnResultWhenResultCalled(BalancingStrategy balancingStrategy) {
         try (FixedThreadPool threadPool = new FixedThreadPool(3, balancingStrategy)) {
             TaskScheduler scheduler = new TaskScheduler(threadPool);
             Task<String> task = scheduler.schedule(() -> {
@@ -42,7 +42,7 @@ public class ThreadPoolTest {
     @ParameterizedTest
     @EnumSource(BalancingStrategy.class)
     @DisplayName("Check isCompleted() not blocking and return status according to execution progress")
-    public void shouldNotBlockAndReturnStatusWhenIsCompletedCalled(BalancingStrategy balancingStrategy) throws Exception {
+    public void shouldNotBlockAndReturnStatusWhenIsCompletedCalled(BalancingStrategy balancingStrategy) {
         try (FixedThreadPool threadPool = new FixedThreadPool(3, balancingStrategy)) {
             TaskScheduler scheduler = new TaskScheduler(threadPool);
             Task<String> task = scheduler.schedule(() -> {
@@ -58,7 +58,7 @@ public class ThreadPoolTest {
     @ParameterizedTest
     @EnumSource(BalancingStrategy.class)
     @DisplayName("Check case when #_tasks > #_threads")
-    public void shouldProcessWhenThereAreMoreTasksThanThreads(BalancingStrategy balancingStrategy) throws Exception {
+    public void shouldProcessWhenThereAreMoreTasksThanThreads(BalancingStrategy balancingStrategy) {
         int taskCount = 15;
         List<Task<?>> tasks = new ArrayList<>(taskCount);
         try (FixedThreadPool threadPool = new FixedThreadPool(3, balancingStrategy)) {
@@ -80,7 +80,7 @@ public class ThreadPoolTest {
     @ParameterizedTest
     @EnumSource(BalancingStrategy.class)
     @DisplayName("Check tasks process sequentially using continueWith()")
-    public void shouldProcessContinuedTasksSequentially(BalancingStrategy balancingStrategy) throws Exception {
+    public void shouldProcessContinuedTasksSequentially(BalancingStrategy balancingStrategy) {
         try (FixedThreadPool threadPool = new FixedThreadPool(3, balancingStrategy)) {
             TaskScheduler scheduler = new TaskScheduler(threadPool);
 
@@ -104,7 +104,7 @@ public class ThreadPoolTest {
     @ParameterizedTest
     @EnumSource(BalancingStrategy.class)
     @DisplayName("Check thread pool does not accept tasks after closing and finish existent tasks")
-    public void shouldNotAcceptNewTasksAndFinishExistentWhenClosing(BalancingStrategy balancingStrategy) throws Exception {
+    public void shouldNotAcceptNewTasksAndFinishExistentWhenClosing(BalancingStrategy balancingStrategy) {
         FixedThreadPool threadPool = new FixedThreadPool(3, balancingStrategy);
         TaskScheduler scheduler = new TaskScheduler(threadPool);
 
@@ -121,7 +121,7 @@ public class ThreadPoolTest {
     @ParameterizedTest
     @EnumSource(BalancingStrategy.class)
     @DisplayName("Check exception thrown in task is wrapped and rethrown on result() call ")
-    public void shouldRethrowExceptionWhenItIsThrownFromTask(BalancingStrategy balancingStrategy) throws Exception {
+    public void shouldRethrowExceptionWhenItIsThrownFromTask(BalancingStrategy balancingStrategy) {
         try (FixedThreadPool threadPool = new FixedThreadPool(3, balancingStrategy)) {
             TaskScheduler scheduler = new TaskScheduler(threadPool);
 
