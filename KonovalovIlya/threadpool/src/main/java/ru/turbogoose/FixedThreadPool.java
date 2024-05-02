@@ -27,7 +27,6 @@ public class FixedThreadPool implements AutoCloseable {
             threads.add(newThread);
         }
         threads.forEach(Thread::start);
-        System.out.println("Thread pool initialized and running");
     }
 
     public void enqueue(Task<?> task) {
@@ -43,6 +42,5 @@ public class FixedThreadPool implements AutoCloseable {
     public void close() {
         closed = true;
         threads.forEach(Thread::interrupt);
-        System.out.println("Thread pool closed");
     }
 }
