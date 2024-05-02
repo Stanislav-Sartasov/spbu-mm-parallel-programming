@@ -1,16 +1,16 @@
 package ru.turbogoose.thread;
 
-import ru.turbogoose.deque.Deque;
-import ru.turbogoose.task.Task;
+import ru.turbogoose.BlockingDeque;
+import ru.turbogoose.Task;
 
 import java.util.Map;
 import java.util.Random;
 
 public class WorkStealingThread extends Thread {
-    private final Map<Long, Deque<Task<?>>> context;
+    private final Map<Long, BlockingDeque<Task<?>>> context;
     private final Random random;
 
-    public WorkStealingThread(Map<Long, Deque<Task<?>>> context) {
+    public WorkStealingThread(Map<Long, BlockingDeque<Task<?>>> context) {
         this.context = context;
         this.random = new Random();
     }
@@ -18,7 +18,7 @@ public class WorkStealingThread extends Thread {
     @Override
     public void run() {
         Thread me = Thread.currentThread();
-        Deque<Task<?>> myDeque = context.get(me.getId());
+        BlockingDeque<Task<?>> myDeque = context.get(me.getId());
         Task<?> task = myDeque.popTail();
         while (task != null || !me.isInterrupted()) {
             while (task != null) {
@@ -30,7 +30,7 @@ public class WorkStealingThread extends Thread {
                 long victimId = context.keySet().stream()
                         .skip(random.nextInt(context.size()))
                         .findFirst().orElseThrow();
-                Deque<Task<?>> victimQueue = context.get(victimId);
+                BlockingDeque<Task<?>> victimQueue = context.get(victimId);
                 if (!victimQueue.isEmpty()) {
                     task = victimQueue.popHead();
                 }

@@ -1,18 +1,17 @@
-package ru.turbogoose.task;
+package ru.turbogoose;
 
 
 import java.util.concurrent.Callable;
 
-public class TaskImpl<T> implements Task<T> {
+public class Task<T> {
     private final Callable<T> task;
     private volatile T result = null;
     private volatile Exception suppressedException = null;
 
-    public TaskImpl(Callable<T> task) {
+    public Task(Callable<T> task) {
         this.task = task;
     }
 
-    @Override
     public void run() {
         try {
             result = task.call();
@@ -21,12 +20,10 @@ public class TaskImpl<T> implements Task<T> {
         }
     }
 
-    @Override
     public boolean isCompleted() {
         return result != null;
     }
 
-    @Override
     public T result() {
         while (result == null && suppressedException == null) {
             Thread.yield();

@@ -1,19 +1,17 @@
-package ru.turbogoose.task;
-
-import ru.turbogoose.pool.ThreadPool;
+package ru.turbogoose;
 
 import java.util.concurrent.Callable;
 import java.util.function.Function;
 
 public class TaskScheduler {
-    private final ThreadPool threadPool;
+    private final FixedThreadPool threadPool;
 
-    public TaskScheduler(ThreadPool threadPool) {
+    public TaskScheduler(FixedThreadPool threadPool) {
         this.threadPool = threadPool;
     }
 
     public <T> Task<T> schedule(Callable<T> action) {
-        TaskImpl<T> task = new TaskImpl<>(action);
+        Task<T> task = new Task<>(action);
         threadPool.enqueue(task);
         return task;
     }
