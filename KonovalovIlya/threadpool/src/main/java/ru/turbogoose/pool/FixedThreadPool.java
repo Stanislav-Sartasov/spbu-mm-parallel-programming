@@ -1,7 +1,7 @@
 package ru.turbogoose.pool;
 
+import ru.turbogoose.deque.BlockingDeque;
 import ru.turbogoose.deque.Deque;
-import ru.turbogoose.deque.UnboundedDeque;
 import ru.turbogoose.task.Task;
 import ru.turbogoose.thread.ThreadFactory;
 
@@ -23,7 +23,7 @@ public class FixedThreadPool implements ThreadPool {
         threads = new ArrayList<>(threadCount);
         for (int i = 0; i < this.threadCount; i++) {
             Thread newThread = ThreadFactory.newThread(balancingStrategy, context);
-            context.putIfAbsent(newThread.getId(), new UnboundedDeque<>());
+            context.putIfAbsent(newThread.getId(), new BlockingDeque<>());
             threads.add(newThread);
         }
     }
@@ -32,7 +32,7 @@ public class FixedThreadPool implements ThreadPool {
     public void enqueue(Task<?> task) {
         int threadNum = random.nextInt(threadCount);
         long threadId = threads.get(threadNum).getId();
-        context.get(threadId).pushTail(task);
+        context.get(threadId).pushHead(task);
     }
 
     @Override
