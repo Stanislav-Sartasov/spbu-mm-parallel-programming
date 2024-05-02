@@ -20,7 +20,7 @@ public class WorkStealingThread extends Thread {
         Thread me = Thread.currentThread();
         Deque<Task<?>> myDeque = context.get(me.getId());
         Task<?> task = myDeque.popTail();
-        while (!me.isInterrupted()) {
+        while (task != null || !me.isInterrupted()) {
             while (task != null) {
                 task.run();
                 task = myDeque.popTail();

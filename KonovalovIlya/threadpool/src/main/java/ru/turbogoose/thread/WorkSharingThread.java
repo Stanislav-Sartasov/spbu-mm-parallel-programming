@@ -20,7 +20,7 @@ public class WorkSharingThread extends Thread {
     public void run() {
         Thread me = Thread.currentThread();
         Deque<Task<?>> myQueue = context.get(me.getId());
-        while (!me.isInterrupted()) {
+        while (!me.isInterrupted() || !myQueue.isEmpty()) {
             Task<?> task = myQueue.popTail();
             if (task != null) {
                 task.run();
