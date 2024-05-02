@@ -1,18 +1,24 @@
 package ru.turbogoose.task;
 
-import java.util.function.Supplier;
+
+import java.util.concurrent.Callable;
 
 public class TaskImpl<T> implements Task<T> {
-    private final Supplier<T> task;
+    private final Callable<T> task;
     private volatile T result = null;
+    private volatile Exception suppressedException = null;
 
-    public TaskImpl(Supplier<T> task) {
+    public TaskImpl(Callable<T> task) {
         this.task = task;
     }
 
     @Override
     public void run() {
-        result = task.get();
+        try {
+            result = task.call();
+        } catch (Exception exc) {
+            suppressedException = exc;
+        }
     }
 
     @Override
@@ -22,8 +28,11 @@ public class TaskImpl<T> implements Task<T> {
 
     @Override
     public T result() {
-        while (result == null) {
+        while (result == null && suppressedException == null) {
             Thread.yield();
+        }
+        if (suppressedException != null) {
+            throw new RuntimeException(suppressedException);
         }
         return result;
     }
