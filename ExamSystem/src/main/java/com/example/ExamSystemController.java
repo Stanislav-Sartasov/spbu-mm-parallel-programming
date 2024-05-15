@@ -1,6 +1,7 @@
 package com.example;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;  // Add this import
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -12,6 +13,11 @@ public class ExamSystemController {
     @Autowired
     public ExamSystemController(ExamSystem examSystem) {
         this.examSystem = examSystem;
+    }
+
+    @GetMapping("/health")
+    public ResponseEntity<String> health() {
+        return ResponseEntity.ok("UP");
     }
 
     @PostMapping("/add")
