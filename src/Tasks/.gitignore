@@ -1,0 +1,35 @@
+# Игнорирование скомпилированных файлов Java
+*.class
+
+# Игнорирование собранных файлов Java
+bin/
+target/
+
+# Игнорирование исходных файлов конфигурации IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Игнорирование файлов логов
+*.log
+
+# Игнорирование временных файлов
+*~
+
+# Игнорирование файлов зависимостей Maven
+/.mvn/
+target/
+dependency-reduced-pom.xml
+buildNumber.properties
+
+# Игнорирование файлов настроек Gradle
+.gradle/
+build/
+
+# Игнорирование файлов настроек Eclipse
+.project
+.settings/
+
+# Игнорирование файлов настроек NetBeans
+nbproject/
